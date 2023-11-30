@@ -81,3 +81,30 @@ const staffs = [
     }
 ]
 
+
+const tbody = document.getElementById('table-body')
+
+const showData = () => {
+    if (!staffs.length || !tbody) {
+        return
+    }
+
+    staffs.forEach((elem, index) => {
+        const tableRow = tbody.insertRow(index)
+
+        const cells = {
+            id: tableRow.insertCell(),
+            name: tableRow.insertCell(),
+            skills: tableRow.insertCell(),
+            employment_at: tableRow.insertCell(),
+            gender: tableRow.insertCell(),
+            age: tableRow.insertCell(),
+            salary: tableRow.insertCell()
+        }
+
+        Object.keys(cells).forEach((key) => {
+            cells[key].innerHTML = elem[key]
+        })
+
+    })
+}
