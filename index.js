@@ -83,12 +83,16 @@ const staffs = [
 
 
 const tbody = document.getElementById('table-body')
+const modal = document.getElementById('modal')
+const form = document.getElementById('form')
 const tableFields = [ 'id', 'name', 'skills', 'employment_at', 'gender', 'age', 'salary' ]
 
 const showData = () => {
     if (!staffs.length || !tbody) {
         return
     }
+
+    tbody.innerHTML = ''
 
     staffs.forEach((elem, index) => {
         const tableRow = tbody.insertRow(index)
@@ -101,4 +105,31 @@ const showData = () => {
         })
     })
 }
+
+document.addEventListener('click', ({target}) => {
+    if (['close-modal', 'buttonAdd'].includes(target.id)) {
+        modal.classList.toggle('show')
+    }
+    if (target.id === "save-modal") {
+        handleSave()
+    }
+})
+
+const handleSave = () => {
+    const formData = new FormData(form)
+
+    const data = Object.fromEntries(formData.entries()) || {}
+
+    const isDataValid = Object.values(data).every((elem) => elem.length)
+
+    if (!isDataValid) {
+        return
+    }
+
+    staffs.push({id: staffs.length + 1, ...data})
+    showData()
+    modal.classList.toggle('show')
+}
+
+
 showData()

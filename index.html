@@ -29,7 +29,7 @@
         </div>
         <div class="col"></div>
         <div class="col-1">
-            <button class="btn btn-primary open-modal">Добавить</button>
+            <button class="btn btn-primary open-modal" id="buttonAdd">Добавить</button>
         </div>
     </div>
     <div class="row mt-5">
@@ -59,7 +59,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="row">
-                        <form>
+                        <form id="form">
                             <div class="mb-3">
                                 <div class="row">
                                     <label class="col-form-label">Пол:</label>
@@ -109,13 +109,13 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary close-modal" data-bs-dismiss="modal">Отменить</button>
-                    <button type="button" class="btn btn-primary save-modal">Сохранить</button>
+                    <button type="button" class="btn btn-secondary close-modal" id="close-modal" data-bs-dismiss="modal">Отменить</button>
+                    <button type="button" class="btn btn-primary save-modal" id="save-modal">Сохранить</button>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<script src="index.js"></script>
+<script defer src="index.js"></script>
 </body>
 </html>
