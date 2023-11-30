@@ -83,6 +83,7 @@ const staffs = [
 
 
 const tbody = document.getElementById('table-body')
+const tableFields = [ 'id', 'name', 'skills', 'employment_at', 'gender', 'age', 'salary' ]
 
 const showData = () => {
     if (!staffs.length || !tbody) {
@@ -92,19 +93,12 @@ const showData = () => {
     staffs.forEach((elem, index) => {
         const tableRow = tbody.insertRow(index)
 
-        const cells = {
-            id: tableRow.insertCell(),
-            name: tableRow.insertCell(),
-            skills: tableRow.insertCell(),
-            employment_at: tableRow.insertCell(),
-            gender: tableRow.insertCell(),
-            age: tableRow.insertCell(),
-            salary: tableRow.insertCell()
-        }
+        const cells = {}
 
-        Object.keys(cells).forEach((key) => {
-            cells[key].innerHTML = elem[key]
+        tableFields.forEach(tableName => {
+            cells[tableName] = tableRow.insertCell()
+            cells[tableName].innerHTML = elem[tableName]
         })
-
     })
 }
+showData()
