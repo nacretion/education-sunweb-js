@@ -87,6 +87,7 @@ const modal = document.getElementById('modal')
 const form = document.getElementById('form')
 const filter = document.getElementById('filter')
 const tableFields = [ 'id', 'name', 'skills', 'employment_at', 'gender', 'age', 'salary' ]
+
 const getFormatFunc = {
     default: (field) => field,
     gender: (field) => field.trim().toLowerCase() === 'male' ? 'Мужской' : 'Женский',
@@ -142,6 +143,14 @@ const filterData = () => {
     showData(filteredData)
 }
 
+const sortData = ({sort, order}) => {
+    const sortedData = [...staffs].sort((fElem, sElem) => {
+
+        return order === 'asc' ? fElem[sort] < sElem[sort]? -1 : 1 : fElem[sort] > sElem[sort]? -1 : 1
+    })
+    showData(sortedData)
+}
+
 const handleSave = () => {
     const formData = new FormData(form)
 
@@ -159,23 +168,30 @@ const handleSave = () => {
 }
 
 const getStaffsMaxId = () => {
-    return staffs.reduce((maxId, currentElem) => {
-        return maxId < currentElem.id ? currentElem.id : maxId
-    }, [])
+    return Math.max(...staffs.map((elem) => elem.id))
 }
 
-document.addEventListener('click', ({target}) => {
-    if (['close-modal', 'buttonAdd'].includes(target.id)) {
+document.addEventListener('click', (ev) => {
+    if (ev.target.id === 'buttonAdd') {
         modal.classList.toggle('show')
     }
 
-    if (target.className === 'buttonDelete') {
-        const index = staffs.indexOf(target.parentElement.ref)
+    if (ev.target.className.includes('close-modal')) {
+        modal.classList.toggle('show')
+    }
+
+    if (ev.target.dataset.sort) {
+        ev.target.dataset.order = ev.target.dataset.order === 'asc' ? 'desc' : 'asc'
+        sortData(ev.target.dataset)
+    }
+
+    if (ev.target.className === 'buttonDelete') {
+        const index = staffs.indexOf(ev.target.parentElement.ref)
         staffs.splice(index, 1);
         showData()
     }
 
-    if (target.id === "save-modal") {
+    if (ev.target.id === "save-modal") {
         handleSave()
         modal.classList.toggle('show')
     }
