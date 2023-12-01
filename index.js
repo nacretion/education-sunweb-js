@@ -110,6 +110,10 @@ const showData = (data = staffs) => {
             cells[tableName] = tableRow.insertCell()
             cells[tableName].innerHTML = formatField(elem[tableName])
         })
+        tableRow.className = 'tableRow'
+        tableRow.ref = elem
+        cells['delete'] = tableRow.insertCell()
+        cells['delete'].className = 'buttonDelete'
     })
 }
 
@@ -149,17 +153,31 @@ const handleSave = () => {
         return
     }
 
-    staffs.push({id: staffs.length + 1, ...data})
+    // Не учитывается уникальность id. Такую задачу решает БД
+    staffs.push({id: getStaffsMaxId() + 1, ...data})
     showData()
-    modal.classList.toggle('show')
+}
+
+const getStaffsMaxId = () => {
+    return staffs.reduce((maxId, currentElem) => {
+        return maxId < currentElem.id ? currentElem.id : maxId
+    }, [])
 }
 
 document.addEventListener('click', ({target}) => {
     if (['close-modal', 'buttonAdd'].includes(target.id)) {
         modal.classList.toggle('show')
     }
+
+    if (target.className === 'buttonDelete') {
+        const index = staffs.indexOf(target.parentElement.ref)
+        staffs.splice(index, 1);
+        showData()
+    }
+
     if (target.id === "save-modal") {
         handleSave()
+        modal.classList.toggle('show')
     }
 })
 
