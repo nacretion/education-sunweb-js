@@ -85,35 +85,58 @@ const staffs = [
 const tbody = document.getElementById('table-body')
 const modal = document.getElementById('modal')
 const form = document.getElementById('form')
+const filter = document.getElementById('filter')
 const tableFields = [ 'id', 'name', 'skills', 'employment_at', 'gender', 'age', 'salary' ]
+const getFormatFunc = {
+    default: (field) => field,
+    gender: (field) => field.trim().toLowerCase() === 'male' ? 'Мужской' : 'Женский',
+    salary: (field) => field + ' ₽'
+}
 
-const showData = () => {
+const showData = (data = staffs) => {
     if (!staffs.length || !tbody) {
         return
     }
 
     tbody.innerHTML = ''
 
-    staffs.forEach((elem, index) => {
+    data.forEach((elem, index) => {
         const tableRow = tbody.insertRow(index)
 
         const cells = {}
 
         tableFields.forEach(tableName => {
+            const formatField = getFormatFunc[tableName] || getFormatFunc.default
             cells[tableName] = tableRow.insertCell()
-            cells[tableName].innerHTML = elem[tableName]
+            cells[tableName].innerHTML = formatField(elem[tableName])
         })
     })
 }
 
-document.addEventListener('click', ({target}) => {
-    if (['close-modal', 'buttonAdd'].includes(target.id)) {
-        modal.classList.toggle('show')
+const debounce = (callback, delay = 400) => {
+    let prevTimeoutId;
+
+    return (...args) => {
+        clearTimeout(prevTimeoutId)
+        prevTimeoutId = setTimeout(() => callback(...args), delay)
     }
-    if (target.id === "save-modal") {
-        handleSave()
-    }
-})
+}
+
+const filterData = () => {
+    const filterQuery = filter.value.toLowerCase()
+
+    const filteredData = staffs.filter((elem) =>
+        Object.keys(elem).some((key) => {
+            const formatField = getFormatFunc[key] || getFormatFunc.default
+
+            const formattedField = formatField(elem[key])
+            const fieldValue = formattedField.toString().toLowerCase()
+
+            return fieldValue.includes(filterQuery)
+        })
+    )
+    showData(filteredData)
+}
 
 const handleSave = () => {
     const formData = new FormData(form)
@@ -131,5 +154,15 @@ const handleSave = () => {
     modal.classList.toggle('show')
 }
 
+document.addEventListener('click', ({target}) => {
+    if (['close-modal', 'buttonAdd'].includes(target.id)) {
+        modal.classList.toggle('show')
+    }
+    if (target.id === "save-modal") {
+        handleSave()
+    }
+})
+
+filter.addEventListener('input', debounce(() => filterData()))
 
 showData()
