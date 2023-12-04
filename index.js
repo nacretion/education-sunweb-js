@@ -31,7 +31,8 @@ const getUsers = async (
     search = paginationProxy.search
 ) => {
     loader.classList.add('loaderShow')
-    const url = baseGETURL + `/users?offset=${offset}&limit=${limit}${search? '&search=' + search : ''}`
+    const url = baseGETURL +
+        `/users?offset=${offset}&limit=${limit}${search? '&search=' + search : ''}`
 
     const data = await fetch(url)
 
@@ -89,7 +90,7 @@ const tableFields = ['id', 'first_name', 'last_name', 'date_of_birth', 'gender',
 const getFormatFunc = {
     default: (field) => field,
     gender: (field) => field.trim().toLowerCase() === 'male' ? 'Мужской' : 'Женский',
-    date_of_birth: (field) => new Date(field).toLocaleDateString()
+    date_of_birth: (field) => new Date(field).toLocaleDateString('en-US')
 }
 
 const validation = {
@@ -149,19 +150,36 @@ const handleSave = async () => {
 
     const data = Object.fromEntries(formData.entries()) || {}
 
-    console.log(Object.keys(data))
-    const isDataValid = Object.keys(data).every(key => {
+
+    Object.keys(data).forEach(key => {
         const formatFunc = getFormatFunc[key] || getFormatFunc.default
         const regex = validation[key] || validation.default
         const formattedField = formatFunc(data[key])
 
-        return regex.test(formattedField)
+        const isValid = regex.test(formattedField)
+
+        const input = document.getElementsByName(key)[0]
+
+        if (!isValid) {
+            console.log({
+                regex,
+                formattedField,
+                isValid
+            })
+            input.classList.add('is-invalid')
+        } else {
+            input.classList.remove('is-invalid')
+        }
+
+        return isValid
     })
 
-    console.log({isDataValid})
+    const isDataValid = !document.getElementsByClassName('is-invalid')
+
     if (!isDataValid) {
         return
     }
+
     const id = getStaffsMaxId() + 1
     const user = {...data, id}
 
