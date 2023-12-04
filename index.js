@@ -1,101 +1,99 @@
-const staffs = [
+let total_users = 0
+
+const paginationProxy = new Proxy(
     {
-        id: 1,
-        name: "John",
-        age: 30,
-        gender: "male",
-        salary: 5000,
-        married: false,
-        skills: ["html", "css", "js"],
-        employment_at: "2020-01-01"
+        limit: 20,
+        offset: 0,
+        staffs: [],
+        search: ''
     },
     {
-        id: 2,
-        name: "Jane",
-        age: 25,
-        gender: "female",
-        salary: 4000,
-        married: true,
-        skills: ["html", "css", "js", "php"],
-        employment_at: "2023-06-21"
-    },
-    {
-        id: 3,
-        name: "Bob",
-        age: 35,
-        gender: "male",
-        salary: 6000,
-        married: false,
-        skills: ["html", "css", "js", "python"],
-        employment_at: "2021-03-15"
-    },
-    {
-        id: 4,
-        name: "Alice",
-        age: 28,
-        gender: "female",
-        salary: 4500,
-        married: true,
-        skills: ["html", "css"],
-        employment_at: "2022-09-01"
-    },
-    {
-        id: 5,
-        name: "Charlie",
-        age: 40,
-        gender: "male",
-        salary: 7000,
-        married: true,
-        skills: ["html", "css", "js", "python", "java"],
-        employment_at: "2020-07-10"
-    },
-    {
-        id: 6,
-        name: "Emily",
-        age: 32,
-        gender: "female",
-        salary: 5000,
-        married: true,
-        skills: ["js", "C++"],
-        employment_at: "2023-02-28"
-    },
-    {
-        id: 7,
-        name: "David",
-        age: 29,
-        gender: "male",
-        salary: 5500,
-        married: true,
-        skills: ["html", "css", "js"],
-        employment_at: "2021-11-05"
-    },
-    {
-        id: 8,
-        name: "Sophia",
-        age: 27,
-        gender: "female",
-        salary: 4000,
-        married: true,
-        skills: ["html", "css", "js"],
-        employment_at: "2022-08-15"
+        set: function (target, key, value) {
+            target[key] = value;
+
+            if (key === 'search') {
+                target['offset'] = 0
+            }
+
+            getUsers(target.limit, target.offset)
+                .then(users => showData(users))
+
+            return true;
+        }
+    });
+
+const baseGETURL = 'https://api.slingacademy.com/v1/sample-data'
+const basePOSTURL = 'https://jsonplaceholder.typicode.com'
+
+const getUsers = async (
+    limit = paginationProxy.limit,
+    offset = paginationProxy.offset,
+    search = paginationProxy.search
+) => {
+    loader.classList.add('loaderShow')
+    const url = baseGETURL + `/users?offset=${offset}&limit=${limit}${search? '&search=' + search : ''}`
+
+    const data = await fetch(url)
+
+    const response = await data.json()
+    total_users = response.total_users
+    if (response.success) {
+
+        loader.classList.remove('loaderShow')
+        return response.users
     }
-]
+}
+
+const saveUser = async (user) => {
+    loader.classList.add('loaderShow')
+    const url = basePOSTURL + `/users`
+
+    const response = await fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user),
+    })
+
+    if (response.ok) {
+        loader.classList.remove('loaderShow')
+        return response.body
+    }
+}
+
+const deleteUser = async (id) => {
+    loader.classList.add('loaderShow')
+    const url = basePOSTURL + `/users/${id}`
+
+    const response = await fetch(url, {
+        method: 'DELETE'
+    })
+
+    if (response.ok) {
+        loader.classList.remove('loaderShow')
+        return response.body
+    }
+}
 
 
 const tbody = document.getElementById('table-body')
 const modal = document.getElementById('modal')
 const form = document.getElementById('form')
 const filter = document.getElementById('filter')
-const tableFields = [ 'id', 'name', 'skills', 'employment_at', 'gender', 'age', 'salary' ]
+const notify = document.getElementsByClassName('toast')[0] || undefined
+const notifyBody = document.getElementById('notifyBody')
+const loader = document.getElementById('loader')
 
+const tableFields = ['id', 'first_name', 'last_name', 'date_of_birth', 'gender', 'state', 'street']
 const getFormatFunc = {
     default: (field) => field,
     gender: (field) => field.trim().toLowerCase() === 'male' ? 'Мужской' : 'Женский',
-    salary: (field) => field + ' ₽'
+    date_of_birth: (field) => new Date(field).toLocaleDateString()
 }
 
-const showData = (data = staffs) => {
-    if (!staffs.length || !tbody) {
+const showData = (data = paginationProxy.staffs) => {
+    if (!data.length || !tbody) {
         return
     }
 
@@ -112,7 +110,7 @@ const showData = (data = staffs) => {
             cells[tableName].innerHTML = formatField(elem[tableName])
         })
         tableRow.className = 'tableRow'
-        tableRow.ref = elem
+        tableRow.ref = elem.id
         cells['delete'] = tableRow.insertCell()
         cells['delete'].className = 'buttonDelete'
     })
@@ -128,30 +126,18 @@ const debounce = (callback, delay = 400) => {
 }
 
 const filterData = () => {
-    const filterQuery = filter.value.toLowerCase()
-
-    const filteredData = staffs.filter((elem) =>
-        Object.keys(elem).some((key) => {
-            const formatField = getFormatFunc[key] || getFormatFunc.default
-
-            const formattedField = formatField(elem[key])
-            const fieldValue = formattedField.toString().toLowerCase()
-
-            return fieldValue.includes(filterQuery)
-        })
-    )
-    showData(filteredData)
+    paginationProxy.search = filter.value.toLowerCase()
 }
 
 const sortData = ({sort, order}) => {
-    const sortedData = [...staffs].sort((fElem, sElem) => {
+    const sortedData = [...paginationProxy.staffs].sort((fElem, sElem) => {
 
-        return order === 'asc' ? fElem[sort] < sElem[sort]? -1 : 1 : fElem[sort] > sElem[sort]? -1 : 1
+        return order === 'asc' ? fElem[sort] < sElem[sort] ? -1 : 1 : fElem[sort] > sElem[sort] ? -1 : 1
     })
     showData(sortedData)
 }
 
-const handleSave = () => {
+const handleSave = async () => {
     const formData = new FormData(form)
 
     const data = Object.fromEntries(formData.entries()) || {}
@@ -161,17 +147,38 @@ const handleSave = () => {
     if (!isDataValid) {
         return
     }
+    const id = getStaffsMaxId() + 1
+    const user = {...data, id}
 
-    // Не учитывается уникальность id. Такую задачу решает БД
-    staffs.push({id: getStaffsMaxId() + 1, ...data})
-    showData()
+    const response = await saveUser(user)
+
+    if (response) {
+        notify.classList.add('show')
+        setTimeout(() => {
+            notify.classList.remove('show')
+        }, 3000)
+        notifyBody.innerHTML = `User with id=${id} created!`
+    }
+}
+
+const handleRemove = async (id) => {
+    const response = await deleteUser(id)
+
+    if (response) {
+        notify.classList.add('show')
+        setTimeout(() => {
+            notify.classList.remove('show')
+        }, 3000)
+        notifyBody.innerHTML = `User with id=${id} removed!`
+    }
 }
 
 const getStaffsMaxId = () => {
-    return Math.max(...staffs.map((elem) => elem.id))
+    return Math.max(...paginationProxy.staffs.map((elem) => elem.id))
 }
 
-document.addEventListener('click', (ev) => {
+document.addEventListener('click', async (ev) => {
+    ev.stopPropagation()
     if (ev.target.id === 'buttonAdd') {
         modal.classList.toggle('show')
     }
@@ -186,17 +193,23 @@ document.addEventListener('click', (ev) => {
     }
 
     if (ev.target.className === 'buttonDelete') {
-        const index = staffs.indexOf(ev.target.parentElement.ref)
-        staffs.splice(index, 1);
-        showData()
+        await handleRemove(ev.target.parentElement.ref)
+    }
+
+    if (ev.target.id === "next" && paginationProxy.offset < total_users - paginationProxy.limit) {
+        paginationProxy.offset += paginationProxy.limit
+    }
+
+    if (ev.target.id === "prev" && paginationProxy.offset - paginationProxy.limit >= 0) {
+        paginationProxy.offset -= paginationProxy.limit
     }
 
     if (ev.target.id === "save-modal") {
-        handleSave()
+        await handleSave()
         modal.classList.toggle('show')
     }
-})
+}, {})
 
 filter.addEventListener('input', debounce(() => filterData()))
 
-showData()
+getUsers().then(users => paginationProxy.staffs = users)

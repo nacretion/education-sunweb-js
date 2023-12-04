@@ -9,6 +9,13 @@
 </head>
 <body>
 <div class="container">
+    <div class="toast align-items-center" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body" id="notifyBody">
+            </div>
+            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
     <menu class="nav nav-pills mb-4">
         <li class="nav-item">
             <a href="index.html" class="nav-link active">Главная</a>
@@ -33,21 +40,32 @@
         </div>
     </div>
     <div class="row mt-5">
-        <div class="col">
+        <div class="col relative">
             <table class="table table-sm table-striped table-hover">
                 <thead>
                     <tr>
                         <th scope="col" data-sort="id">#</th>
-                        <th scope="col" data-sort="name">Имя</th>
-                        <th scope="col">Навыки</th>
-                        <th scope="col" data-sort="employment_at">Дата</th>
+                        <th scope="col" data-sort="first_name">Имя</th>
+                        <th scope="col" data-sort="last_name">Фамилия</th>
+                        <th scope="col" data-sort="date_of_birth">Дата рождения</th>
                         <th scope="col" data-sort="gender">Пол</th>
-                        <th scope="col" data-sort="age">Возраст</th>
-                        <th scope="col" data-sort="salary">Зарплата</th>
+                        <th scope="col" data-sort="state">Штат</th>
+                        <th scope="col" data-sort="address">Адрес</th>
                     </tr>
                 </thead>
                 <tbody id="table-body"></tbody>
             </table>
+            <div class="loader" id="loader">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-between">
+                    <li class="page-item"><a class="page-link" href="#" id="prev">Previous</a></li>
+                    <li class="page-item"><a class="page-link" href="#" id="next">Next</a></li>
+                </ul>
+            </nav>
         </div>
     </div>
     <div class="modal" tabindex="-1" id="modal">
@@ -80,30 +98,30 @@
                             <div class="mb-3">
                                 <div class="row">
                                     <div class="col">
-                                        <label for="staff-name" class="col-form-label">Имя:</label>
-                                        <input type="text" class="form-control" id="staff-name" name="name">
+                                        <label for="staff-first_name" class="col-form-label">Имя:</label>
+                                        <input type="text" class="form-control" id="staff-first_name" name="first_name">
+                                    </div>
+                                    <div class="col">
+                                        <label for="staff-last_name" class="col-form-label">Фамилия:</label>
+                                        <input type="text" class="form-control" id="staff-last_name" name="last_name">
                                     </div>
                                     <div class="col">
                                         <label for="staff-date" class="col-form-label">Дата:</label>
-                                        <input type="date" class="form-control" id="staff-date" name="employment_at">
+                                        <input type="date" class="form-control" id="staff-date" name="date_of_birth">
                                     </div>
                                 </div>
                             </div>
                             <div class="mb-3">
                                 <div class="row">
                                     <div class="col">
-                                        <label for="staff-salary" class="col-form-label">Зарплата:</label>
-                                        <input type="number" step="100" class="form-control" id="staff-salary" name="salary">
+                                        <label for="staff-salary" class="col-form-label">Штат:</label>
+                                        <input type="number" step="100" class="form-control" id="staff-salary" name="state">
                                     </div>
                                     <div class="col">
-                                        <label for="staff-age" class="col-form-label">Возраст:</label>
-                                        <input type="number" class="form-control" id="staff-age" name="age">
+                                        <label for="staff-age" class="col-form-label">Адрес:</label>
+                                        <input type="number" class="form-control" id="staff-age" name="street">
                                     </div>
                                 </div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="staff-skills" class="col-form-label">Навыки:</label>
-                                <textarea class="form-control" id="staff-skills" name="skills" rows="6"></textarea>
                             </div>
                         </form>
                     </div>
