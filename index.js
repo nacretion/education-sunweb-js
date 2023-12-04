@@ -20,15 +20,30 @@ const getUsers = async (limit = 20, offset = 0) => {
     if (response.success) {
         return response.users
     }
-]
 }
 
+const saveUser = async (user) => {
+    const url = basePOSTURL + `/users`
+
+    const response = await fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user),
+    })
+
+    if (response.ok) {
+        return response.body
+    }
+}
 
 const tbody = document.getElementById('table-body')
 const modal = document.getElementById('modal')
 const form = document.getElementById('form')
 const filter = document.getElementById('filter')
-const tableFields = [ 'id', 'name', 'skills', 'employment_at', 'gender', 'age', 'salary' ]
+const notify = document.getElementsByClassName('toast')[0] || undefined
+const notifyBody = document.getElementById('notifyBody')
 
 const tableFields = ['id', 'first_name', 'last_name', 'date_of_birth', 'gender', 'state', 'street']
 const getFormatFunc = {
@@ -89,12 +104,12 @@ const filterData = () => {
 const sortData = ({sort, order}) => {
     const sortedData = [...staffs].sort((fElem, sElem) => {
 
-        return order === 'asc' ? fElem[sort] < sElem[sort]? -1 : 1 : fElem[sort] > sElem[sort]? -1 : 1
+        return order === 'asc' ? fElem[sort] < sElem[sort] ? -1 : 1 : fElem[sort] > sElem[sort] ? -1 : 1
     })
     showData(sortedData)
 }
 
-const handleSave = () => {
+const handleSave = async () => {
     const formData = new FormData(form)
 
     const data = Object.fromEntries(formData.entries()) || {}
@@ -104,17 +119,26 @@ const handleSave = () => {
     if (!isDataValid) {
         return
     }
+    const user = {id: getStaffsMaxId() + 1, ...data}
 
-    // Не учитывается уникальность id. Такую задачу решает БД
-    staffs.push({id: getStaffsMaxId() + 1, ...data})
-    showData()
+    const response = await saveUser(user)
+
+    if (response) {
+        // Не учитывается уникальность id. Такую задачу решает БД
+        staffsProxy.push(user)
+        notify.classList.add('show')
+        setTimeout(() => {
+            notify.classList.remove('show')
+        }, 3000)
+        notifyBody.innerHTML = 'User created!'
+    }
 }
 
 const getStaffsMaxId = () => {
     return Math.max(...staffs.map((elem) => elem.id))
 }
 
-document.addEventListener('click', (ev) => {
+document.addEventListener('click', async (ev) => {
     if (ev.target.id === 'buttonAdd') {
         modal.classList.toggle('show')
     }
@@ -135,7 +159,7 @@ document.addEventListener('click', (ev) => {
     }
 
     if (ev.target.id === "save-modal") {
-        handleSave()
+        await handleSave()
         modal.classList.toggle('show')
     }
 })

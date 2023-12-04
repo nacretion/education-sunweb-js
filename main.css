@@ -17,3 +17,9 @@
 .tableRow:hover .buttonDelete {
     background-position-x: 0;
 }
+
+.toast {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+}
