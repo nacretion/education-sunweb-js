@@ -11,6 +11,10 @@ const paginationProxy = new Proxy(
         set: function (target, key, value) {
             target[key] = value;
 
+            if (key === 'search') {
+                target['offset'] = 0
+            }
+
             getUsers(target.limit, target.offset)
                 .then(users => showData(users))
 
@@ -26,6 +30,7 @@ const getUsers = async (
     offset = paginationProxy.offset,
     search = paginationProxy.search
 ) => {
+    loader.classList.add('loaderShow')
     const url = baseGETURL + `/users?offset=${offset}&limit=${limit}${search? '&search=' + search : ''}`
 
     const data = await fetch(url)
@@ -33,11 +38,14 @@ const getUsers = async (
     const response = await data.json()
     total_users = response.total_users
     if (response.success) {
+
+        loader.classList.remove('loaderShow')
         return response.users
     }
 }
 
 const saveUser = async (user) => {
+    loader.classList.add('loaderShow')
     const url = basePOSTURL + `/users`
 
     const response = await fetch(url, {
@@ -49,17 +57,21 @@ const saveUser = async (user) => {
     })
 
     if (response.ok) {
+        loader.classList.remove('loaderShow')
         return response.body
     }
 }
 
 const deleteUser = async (id) => {
-    console.log(JSON.stringify({id}))
+    loader.classList.add('loaderShow')
     const url = basePOSTURL + `/users/${id}`
 
-    const response = await fetch(url)
+    const response = await fetch(url, {
+        method: 'DELETE'
+    })
 
     if (response.ok) {
+        loader.classList.remove('loaderShow')
         return response.body
     }
 }
@@ -71,6 +83,7 @@ const form = document.getElementById('form')
 const filter = document.getElementById('filter')
 const notify = document.getElementsByClassName('toast')[0] || undefined
 const notifyBody = document.getElementById('notifyBody')
+const loader = document.getElementById('loader')
 
 const tableFields = ['id', 'first_name', 'last_name', 'date_of_birth', 'gender', 'state', 'street']
 const getFormatFunc = {
