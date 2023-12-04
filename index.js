@@ -92,6 +92,13 @@ const getFormatFunc = {
     date_of_birth: (field) => new Date(field).toLocaleDateString()
 }
 
+const validation = {
+    default: /[a-zA-Z]{3,30}/,
+    date_of_birth: /\d{1,2}\/\d{1,2}\/\d{2,4}/,
+    gender: /Мужской|Женский/,
+    street: /^(\d+) ?([A-Za-z](?= ))? (.*?) ([^ ]+?) ?((?<= )APT)? ?((?<= )\d*)?$/
+}
+
 const showData = (data = paginationProxy.staffs) => {
     if (!data.length || !tbody) {
         return
@@ -142,8 +149,16 @@ const handleSave = async () => {
 
     const data = Object.fromEntries(formData.entries()) || {}
 
-    const isDataValid = Object.values(data).every((elem) => elem.length)
+    console.log(Object.keys(data))
+    const isDataValid = Object.keys(data).every(key => {
+        const formatFunc = getFormatFunc[key] || getFormatFunc.default
+        const regex = validation[key] || validation.default
+        const formattedField = formatFunc(data[key])
 
+        return regex.test(formattedField)
+    })
+
+    console.log({isDataValid})
     if (!isDataValid) {
         return
     }
@@ -159,6 +174,7 @@ const handleSave = async () => {
         }, 3000)
         notifyBody.innerHTML = `User with id=${id} created!`
     }
+    modal.classList.toggle('show')
 }
 
 const handleRemove = async (id) => {
@@ -206,7 +222,6 @@ document.addEventListener('click', async (ev) => {
 
     if (ev.target.id === "save-modal") {
         await handleSave()
-        modal.classList.toggle('show')
     }
 }, {})
 
