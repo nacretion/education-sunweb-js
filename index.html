@@ -39,11 +39,11 @@
                     <tr>
                         <th scope="col" data-sort="id">#</th>
                         <th scope="col" data-sort="name">Имя</th>
-                        <th scope="col">Навыки</th>
-                        <th scope="col" data-sort="employment_at">Дата</th>
+                        <th scope="col">Фамилия</th>
+                        <th scope="col" data-sort="employment_at">Дата рождения</th>
                         <th scope="col" data-sort="gender">Пол</th>
-                        <th scope="col" data-sort="age">Возраст</th>
-                        <th scope="col" data-sort="salary">Зарплата</th>
+                        <th scope="col" data-sort="age">Штат</th>
+                        <th scope="col" data-sort="salary">Адрес</th>
                     </tr>
                 </thead>
                 <tbody id="table-body"></tbody>
@@ -80,30 +80,30 @@
                             <div class="mb-3">
                                 <div class="row">
                                     <div class="col">
-                                        <label for="staff-name" class="col-form-label">Имя:</label>
-                                        <input type="text" class="form-control" id="staff-name" name="name">
+                                        <label for="staff-first_name" class="col-form-label">Имя:</label>
+                                        <input type="text" class="form-control" id="staff-first_name" name="first_name">
+                                    </div>
+                                    <div class="col">
+                                        <label for="staff-last_name" class="col-form-label">Фамилия:</label>
+                                        <input type="text" class="form-control" id="staff-last_name" name="last_name">
                                     </div>
                                     <div class="col">
                                         <label for="staff-date" class="col-form-label">Дата:</label>
-                                        <input type="date" class="form-control" id="staff-date" name="employment_at">
+                                        <input type="date" class="form-control" id="staff-date" name="date_of_birth">
                                     </div>
                                 </div>
                             </div>
                             <div class="mb-3">
                                 <div class="row">
                                     <div class="col">
-                                        <label for="staff-salary" class="col-form-label">Зарплата:</label>
-                                        <input type="number" step="100" class="form-control" id="staff-salary" name="salary">
+                                        <label for="staff-salary" class="col-form-label">Штат:</label>
+                                        <input type="number" step="100" class="form-control" id="staff-salary" name="state">
                                     </div>
                                     <div class="col">
-                                        <label for="staff-age" class="col-form-label">Возраст:</label>
-                                        <input type="number" class="form-control" id="staff-age" name="age">
+                                        <label for="staff-age" class="col-form-label">Адрес:</label>
+                                        <input type="number" class="form-control" id="staff-age" name="street">
                                     </div>
                                 </div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="staff-skills" class="col-form-label">Навыки:</label>
-                                <textarea class="form-control" id="staff-skills" name="skills" rows="6"></textarea>
                             </div>
                         </form>
                     </div>
