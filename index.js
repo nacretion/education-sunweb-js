@@ -147,7 +147,8 @@ const handleSave = async () => {
     if (!isDataValid) {
         return
     }
-    const user = {id: getStaffsMaxId() + 1, ...data}
+    const id = getStaffsMaxId() + 1
+    const user = {...data, id}
 
     const response = await saveUser(user)
 
@@ -156,7 +157,7 @@ const handleSave = async () => {
         setTimeout(() => {
             notify.classList.remove('show')
         }, 3000)
-        notifyBody.innerHTML = 'User created!'
+        notifyBody.innerHTML = `User with id=${id} created!`
     }
 }
 
@@ -168,7 +169,7 @@ const handleRemove = async (id) => {
         setTimeout(() => {
             notify.classList.remove('show')
         }, 3000)
-        notifyBody.innerHTML = 'User removed!'
+        notifyBody.innerHTML = `User with id=${id} removed!`
     }
 }
 
