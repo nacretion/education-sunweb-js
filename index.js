@@ -53,6 +53,18 @@ const saveUser = async (user) => {
     }
 }
 
+const deleteUser = async (id) => {
+    console.log(JSON.stringify({id}))
+    const url = basePOSTURL + `/users/${id}`
+
+    const response = await fetch(url)
+
+    if (response.ok) {
+        return response.body
+    }
+}
+
+
 const tbody = document.getElementById('table-body')
 const modal = document.getElementById('modal')
 const form = document.getElementById('form')
@@ -85,7 +97,7 @@ const showData = (data = paginationProxy.staffs) => {
             cells[tableName].innerHTML = formatField(elem[tableName])
         })
         tableRow.className = 'tableRow'
-        tableRow.ref = elem
+        tableRow.ref = elem.id
         cells['delete'] = tableRow.insertCell()
         cells['delete'].className = 'buttonDelete'
     })
@@ -135,11 +147,24 @@ const handleSave = async () => {
     }
 }
 
+const handleRemove = async (id) => {
+    const response = await deleteUser(id)
+
+    if (response) {
+        notify.classList.add('show')
+        setTimeout(() => {
+            notify.classList.remove('show')
+        }, 3000)
+        notifyBody.innerHTML = 'User removed!'
+    }
+}
+
 const getStaffsMaxId = () => {
     return Math.max(...paginationProxy.staffs.map((elem) => elem.id))
 }
 
 document.addEventListener('click', async (ev) => {
+    ev.stopPropagation()
     if (ev.target.id === 'buttonAdd') {
         modal.classList.toggle('show')
     }
@@ -154,9 +179,7 @@ document.addEventListener('click', async (ev) => {
     }
 
     if (ev.target.className === 'buttonDelete') {
-        const index = paginationProxy.staffs.indexOf(ev.target.parentElement.ref)
-        paginationProxy.staffs.splice(index, 1);
-        showData()
+        await handleRemove(ev.target.parentElement.ref)
     }
 
     if (ev.target.id === "next" && paginationProxy.offset < total_users - paginationProxy.limit) {
@@ -171,7 +194,7 @@ document.addEventListener('click', async (ev) => {
         await handleSave()
         modal.classList.toggle('show')
     }
-})
+}, {})
 
 filter.addEventListener('input', debounce(() => filterData()))
 
