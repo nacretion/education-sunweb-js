@@ -45,16 +45,22 @@
                 <thead>
                     <tr>
                         <th scope="col" data-sort="id">#</th>
-                        <th scope="col" data-sort="name">Имя</th>
-                        <th scope="col">Фамилия</th>
-                        <th scope="col" data-sort="employment_at">Дата рождения</th>
+                        <th scope="col" data-sort="first_name">Имя</th>
+                        <th scope="col" data-sort="last_name">Фамилия</th>
+                        <th scope="col" data-sort="date_of_birth">Дата рождения</th>
                         <th scope="col" data-sort="gender">Пол</th>
-                        <th scope="col" data-sort="age">Штат</th>
-                        <th scope="col" data-sort="salary">Адрес</th>
+                        <th scope="col" data-sort="state">Штат</th>
+                        <th scope="col" data-sort="address">Адрес</th>
                     </tr>
                 </thead>
                 <tbody id="table-body"></tbody>
             </table>
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-between">
+                    <li class="page-item"><a class="page-link" href="#" id="prev">Previous</a></li>
+                    <li class="page-item"><a class="page-link" href="#" id="next">Next</a></li>
+                </ul>
+            </nav>
         </div>
     </div>
     <div class="modal" tabindex="-1" id="modal">

@@ -1,22 +1,37 @@
-let staffs = []
-const staffsProxy = new Proxy(staffs, {
-    set: function (target, index, value) {
-        target[index] = value;
-        showData()
-        return true;
-    }
-});
+let total_users = 0
+
+const paginationProxy = new Proxy(
+    {
+        limit: 20,
+        offset: 0,
+        staffs: [],
+        search: ''
+    },
+    {
+        set: function (target, key, value) {
+            target[key] = value;
+
+            getUsers(target.limit, target.offset)
+                .then(users => showData(users))
+
+            return true;
+        }
+    });
 
 const baseGETURL = 'https://api.slingacademy.com/v1/sample-data'
 const basePOSTURL = 'https://jsonplaceholder.typicode.com'
 
-const getUsers = async (limit = 20, offset = 0) => {
-    const url = baseGETURL + `/users?offset=${offset}&limit=${limit}`
+const getUsers = async (
+    limit = paginationProxy.limit,
+    offset = paginationProxy.offset,
+    search = paginationProxy.search
+) => {
+    const url = baseGETURL + `/users?offset=${offset}&limit=${limit}${search? '&search=' + search : ''}`
 
     const data = await fetch(url)
 
     const response = await data.json()
-
+    total_users = response.total_users
     if (response.success) {
         return response.users
     }
@@ -52,8 +67,8 @@ const getFormatFunc = {
     date_of_birth: (field) => new Date(field).toLocaleDateString()
 }
 
-const showData = (data = staffs) => {
-    if (!staffs.length || !tbody) {
+const showData = (data = paginationProxy.staffs) => {
+    if (!data.length || !tbody) {
         return
     }
 
@@ -86,23 +101,11 @@ const debounce = (callback, delay = 400) => {
 }
 
 const filterData = () => {
-    const filterQuery = filter.value.toLowerCase()
-
-    const filteredData = staffs.filter((elem) =>
-        Object.keys(elem).some((key) => {
-            const formatField = getFormatFunc[key] || getFormatFunc.default
-
-            const formattedField = formatField(elem[key])
-            const fieldValue = formattedField.toString().toLowerCase()
-
-            return fieldValue.includes(filterQuery)
-        })
-    )
-    showData(filteredData)
+    paginationProxy.search = filter.value.toLowerCase()
 }
 
 const sortData = ({sort, order}) => {
-    const sortedData = [...staffs].sort((fElem, sElem) => {
+    const sortedData = [...paginationProxy.staffs].sort((fElem, sElem) => {
 
         return order === 'asc' ? fElem[sort] < sElem[sort] ? -1 : 1 : fElem[sort] > sElem[sort] ? -1 : 1
     })
@@ -124,8 +127,6 @@ const handleSave = async () => {
     const response = await saveUser(user)
 
     if (response) {
-        // Не учитывается уникальность id. Такую задачу решает БД
-        staffsProxy.push(user)
         notify.classList.add('show')
         setTimeout(() => {
             notify.classList.remove('show')
@@ -135,7 +136,7 @@ const handleSave = async () => {
 }
 
 const getStaffsMaxId = () => {
-    return Math.max(...staffs.map((elem) => elem.id))
+    return Math.max(...paginationProxy.staffs.map((elem) => elem.id))
 }
 
 document.addEventListener('click', async (ev) => {
@@ -153,9 +154,17 @@ document.addEventListener('click', async (ev) => {
     }
 
     if (ev.target.className === 'buttonDelete') {
-        const index = staffs.indexOf(ev.target.parentElement.ref)
-        staffs.splice(index, 1);
+        const index = paginationProxy.staffs.indexOf(ev.target.parentElement.ref)
+        paginationProxy.staffs.splice(index, 1);
         showData()
+    }
+
+    if (ev.target.id === "next" && paginationProxy.offset < total_users - paginationProxy.limit) {
+        paginationProxy.offset += paginationProxy.limit
+    }
+
+    if (ev.target.id === "prev" && paginationProxy.offset - paginationProxy.limit >= 0) {
+        paginationProxy.offset -= paginationProxy.limit
     }
 
     if (ev.target.id === "save-modal") {
@@ -166,4 +175,4 @@ document.addEventListener('click', async (ev) => {
 
 filter.addEventListener('input', debounce(() => filterData()))
 
-getUsers().then(users => staffsProxy.push(...users))
+getUsers().then(users => paginationProxy.staffs = users)
