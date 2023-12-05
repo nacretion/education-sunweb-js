@@ -86,7 +86,7 @@ const notify = document.getElementsByClassName('toast')[0] || undefined
 const notifyBody = document.getElementById('notifyBody')
 const loader = document.getElementById('loader')
 
-const tableFields = ['id', 'first_name', 'last_name', 'date_of_birth', 'gender', 'state', 'street']
+const tableFields = ['id', 'first_name', 'last_name', 'date_of_birth', 'gender', 'email', 'street']
 const getFormatFunc = {
     default: (field) => field,
     gender: (field) => field.trim().toLowerCase() === 'male' ? 'Мужской' : 'Женский',
@@ -97,7 +97,8 @@ const validation = {
     default: /[a-zA-Z]{3,30}/,
     date_of_birth: /\d{1,2}\/\d{1,2}\/\d{2,4}/,
     gender: /Мужской|Женский/,
-    street: /^(\d+) ?([A-Za-z](?= ))? (.*?) ([^ ]+?) ?((?<= )APT)? ?((?<= )\d*)?$/
+    street: /^(\d+) ?([A-Za-z](?= ))? (.*?) ([^ ]+?) ?((?<= )APT)? ?((?<= )\d*)?$/,
+    email: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
 }
 
 const showData = (data = paginationProxy.staffs) => {
@@ -145,11 +146,8 @@ const sortData = ({sort, order}) => {
     showData(sortedData)
 }
 
-const handleSave = async () => {
-    const formData = new FormData(form)
-
-    const data = Object.fromEntries(formData.entries()) || {}
-
+const validateData = (data = {}) => {
+    let invalidFieldsCount = 0
 
     Object.keys(data).forEach(key => {
         const formatFunc = getFormatFunc[key] || getFormatFunc.default
@@ -161,20 +159,23 @@ const handleSave = async () => {
         const input = document.getElementsByName(key)[0]
 
         if (!isValid) {
-            console.log({
-                regex,
-                formattedField,
-                isValid
-            })
+
+            invalidFieldsCount++
             input.classList.add('is-invalid')
-        } else {
-            input.classList.remove('is-invalid')
+            return
         }
-
-        return isValid
+        input.classList.remove('is-invalid')
     })
+    return invalidFieldsCount
+}
 
-    const isDataValid = !document.getElementsByClassName('is-invalid').length
+const handleSave = async () => {
+    const formData = new FormData(form)
+
+    const data = Object.fromEntries(formData.entries()) || {}
+
+    const isDataValid = !validateData(data) || Object.keys(data).length === 0
+
     if (!isDataValid) {
         return
     }
@@ -214,6 +215,7 @@ document.addEventListener('click', async (ev) => {
     ev.stopPropagation()
     if (ev.target.id === 'buttonAdd') {
         modal.classList.toggle('show')
+        form.reset()
     }
 
     if (ev.target.className.includes('close-modal')) {
