@@ -32,7 +32,7 @@ const getUsers = async (
 ) => {
     loader.classList.add('loaderShow')
     const url = baseGETURL +
-        `/users?offset=${offset}&limit=${limit}${search? '&search=' + search : ''}`
+        `/users?offset=${offset}&limit=${limit}${search ? '&search=' + search : ''}`
 
     const data = await fetch(url)
 
@@ -213,47 +213,71 @@ const getStaffsMaxId = () => {
     return Math.max(...paginationProxy.staffs.map((elem) => elem.id))
 }
 
-document.addEventListener('click', async (ev) => {
-    ev.stopPropagation()
-    if (ev.target.id === 'buttonAdd') {
+const clickHandlerByClass = {
+    default: () => {},
+    'close-modal': () => {
         modal.classList.toggle('show')
-        form.reset()
-    }
-
-    if (ev.target.className.includes('close-modal')) {
-        modal.classList.toggle('show')
-    }
-
-    if (ev.target.className.includes('dropdown-item')) {
+    },
+    'dropdown-item': (ev) => {
         paginationProxy.limit = +ev.target.innerHTML
         dropdown.children[0].innerHTML = ev.target.innerHTML
         dropdownMenu.classList.toggle('show')
-    }
-
-    if (ev.target.className.includes('dropdown-toggle')) {
+    },
+    'dropdown-toggle': () => {
         dropdownMenu.classList.toggle('show')
+    },
+    'buttonDelete': async(ev) => {
+        await handleRemove(ev.target.parentElement.ref)
     }
+}
+
+const clickHandlerById = {
+    default: () => {},
+    'next': () => {
+        if (paginationProxy.offset < total_users - paginationProxy.limit) {
+            paginationProxy.offset += paginationProxy.limit
+        }
+    },
+    'prev': () => {
+        if (paginationProxy.offset - paginationProxy.limit >= 0) {
+            paginationProxy.offset -= paginationProxy.limit
+        }
+    },
+    'save-modal': async() => {
+        await handleSave()
+    },
+    'buttonAdd': () => {
+        modal.classList.toggle('show')
+        form.reset()
+    }
+}
+
+document.addEventListener('click', async (ev) => {
+    ev.stopPropagation()
 
     if (ev.target.dataset.sort) {
         ev.target.dataset.order = ev.target.dataset.order === 'asc' ? 'desc' : 'asc'
         sortData(ev.target.dataset)
-    }
-
-    if (ev.target.className === 'buttonDelete') {
-        await handleRemove(ev.target.parentElement.ref)
-    }
-
-    if (ev.target.id === "next" && paginationProxy.offset < total_users - paginationProxy.limit) {
-        paginationProxy.offset += paginationProxy.limit
-    }
-
-    if (ev.target.id === "prev" && paginationProxy.offset - paginationProxy.limit >= 0) {
-        paginationProxy.offset -= paginationProxy.limit
+        return
     }
 
     if (ev.target.id === "save-modal") {
         await handleSave()
+        return
     }
+
+    const {id, classList} = ev.target
+
+    const validClass = Object.values(classList).find(
+        className => Object.keys(clickHandlerByClass).includes(className)
+    )
+
+    const classHandler = clickHandlerByClass[validClass] || clickHandlerByClass.default
+    const idHandler = clickHandlerById[id] || clickHandlerById.default
+
+    await classHandler(ev)
+    await idHandler()
+
 }, {})
 
 filter.addEventListener('input', debounce(() => filterData()))
