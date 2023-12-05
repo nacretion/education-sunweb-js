@@ -41,6 +41,16 @@
     </div>
     <div class="row mt-5">
         <div class="col relative">
+            <div class="dropdown" id="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                    20
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1" id="dropdownMenu">
+                    <li><a class="dropdown-item" href="#">20</a></li>
+                    <li><a class="dropdown-item" href="#">50</a></li>
+                    <li><a class="dropdown-item" href="#">100</a></li>
+                </ul>
+            </div>
             <table class="table table-sm table-striped table-hover">
                 <thead>
                     <tr>
@@ -52,6 +62,7 @@
                         <th scope="col" data-sort="email">Почта</th>
                         <th scope="col" data-sort="address">Адрес</th>
                     </tr>
+
                 </thead>
                 <tbody id="table-body"></tbody>
             </table>

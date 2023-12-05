@@ -85,6 +85,8 @@ const filter = document.getElementById('filter')
 const notify = document.getElementsByClassName('toast')[0] || undefined
 const notifyBody = document.getElementById('notifyBody')
 const loader = document.getElementById('loader')
+const dropdown = document.getElementById('dropdown')
+const dropdownMenu = document.getElementById('dropdownMenu')
 
 const tableFields = ['id', 'first_name', 'last_name', 'date_of_birth', 'gender', 'email', 'street']
 const getFormatFunc = {
@@ -220,6 +222,16 @@ document.addEventListener('click', async (ev) => {
 
     if (ev.target.className.includes('close-modal')) {
         modal.classList.toggle('show')
+    }
+
+    if (ev.target.className.includes('dropdown-item')) {
+        paginationProxy.limit = +ev.target.innerHTML
+        dropdown.children[0].innerHTML = ev.target.innerHTML
+        dropdownMenu.classList.toggle('show')
+    }
+
+    if (ev.target.className.includes('dropdown-toggle')) {
+        dropdownMenu.classList.toggle('show')
     }
 
     if (ev.target.dataset.sort) {
