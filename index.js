@@ -31,7 +31,8 @@ const getUsers = async (
     search = paginationProxy.search
 ) => {
     loader.classList.add('loaderShow')
-    const url = baseGETURL + `/users?offset=${offset}&limit=${limit}${search? '&search=' + search : ''}`
+    const url = baseGETURL +
+        `/users?offset=${offset}&limit=${limit}${search? '&search=' + search : ''}`
 
     const data = await fetch(url)
 
@@ -85,11 +86,19 @@ const notify = document.getElementsByClassName('toast')[0] || undefined
 const notifyBody = document.getElementById('notifyBody')
 const loader = document.getElementById('loader')
 
-const tableFields = ['id', 'first_name', 'last_name', 'date_of_birth', 'gender', 'state', 'street']
+const tableFields = ['id', 'first_name', 'last_name', 'date_of_birth', 'gender', 'email', 'street']
 const getFormatFunc = {
     default: (field) => field,
     gender: (field) => field.trim().toLowerCase() === 'male' ? 'Мужской' : 'Женский',
-    date_of_birth: (field) => new Date(field).toLocaleDateString()
+    date_of_birth: (field) => new Date(field).toLocaleDateString('en-US')
+}
+
+const validation = {
+    default: /[a-zA-Z]{3,30}/,
+    date_of_birth: /\d{1,2}\/\d{1,2}\/\d{2,4}/,
+    gender: /Мужской|Женский/,
+    street: /^(\d+) ?([A-Za-z](?= ))? (.*?) ([^ ]+?) ?((?<= )APT)? ?((?<= )\d*)?$/,
+    email: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
 }
 
 const showData = (data = paginationProxy.staffs) => {
@@ -137,16 +146,40 @@ const sortData = ({sort, order}) => {
     showData(sortedData)
 }
 
+const validateData = (data = {}) => {
+    let invalidFieldsCount = 0
+
+    Object.keys(data).forEach(key => {
+        const formatFunc = getFormatFunc[key] || getFormatFunc.default
+        const regex = validation[key] || validation.default
+        const formattedField = formatFunc(data[key])
+
+        const isValid = regex.test(formattedField)
+
+        const input = document.getElementsByName(key)[0]
+
+        if (!isValid) {
+
+            invalidFieldsCount++
+            input.classList.add('is-invalid')
+            return
+        }
+        input.classList.remove('is-invalid')
+    })
+    return invalidFieldsCount
+}
+
 const handleSave = async () => {
     const formData = new FormData(form)
 
     const data = Object.fromEntries(formData.entries()) || {}
 
-    const isDataValid = Object.values(data).every((elem) => elem.length)
+    const isDataValid = !validateData(data) || Object.keys(data).length === 0
 
     if (!isDataValid) {
         return
     }
+
     const id = getStaffsMaxId() + 1
     const user = {...data, id}
 
@@ -159,6 +192,7 @@ const handleSave = async () => {
         }, 3000)
         notifyBody.innerHTML = `User with id=${id} created!`
     }
+    modal.classList.toggle('show')
 }
 
 const handleRemove = async (id) => {
@@ -181,6 +215,7 @@ document.addEventListener('click', async (ev) => {
     ev.stopPropagation()
     if (ev.target.id === 'buttonAdd') {
         modal.classList.toggle('show')
+        form.reset()
     }
 
     if (ev.target.className.includes('close-modal')) {
@@ -206,7 +241,6 @@ document.addEventListener('click', async (ev) => {
 
     if (ev.target.id === "save-modal") {
         await handleSave()
-        modal.classList.toggle('show')
     }
 }, {})
 
