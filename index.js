@@ -174,7 +174,7 @@ const handleSave = async () => {
 
     const data = Object.fromEntries(formData.entries()) || {}
 
-    const isDataValid = !validateData(data) || Object.keys(data).length === 0
+    const isDataValid = !validateData(data) && Object.keys(data).length !== 0
 
     if (!isDataValid) {
         return
