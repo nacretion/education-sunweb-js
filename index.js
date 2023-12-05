@@ -174,8 +174,7 @@ const handleSave = async () => {
         return isValid
     })
 
-    const isDataValid = !document.getElementsByClassName('is-invalid')
-
+    const isDataValid = !document.getElementsByClassName('is-invalid').length
     if (!isDataValid) {
         return
     }
