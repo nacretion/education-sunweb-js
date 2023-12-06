@@ -270,11 +270,6 @@ document.addEventListener('click', async (ev) => {
         return
     }
 
-    if (ev.target.id === "save-modal") {
-        await handleSave()
-        return
-    }
-
     const {id, classList} = ev.target
 
     const validClass = Object.values(classList).find(
