@@ -8,7 +8,7 @@
     height: 32px;
 
     transition: background-position-x 200ms;
-    background-image: url("assets/close.svg");
+    background-image: url("../src/assets/close.svg");
     background-repeat: no-repeat;
     background-size: cover;
     background-position-x: 70px;
