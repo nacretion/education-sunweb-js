@@ -11,6 +11,11 @@ const paginationProxy = new Proxy(
         set: function (target, key, value) {
             target[key] = value;
 
+            // Найдено решение лучше, чем определять новый offset или обнулять его
+            // if (key === 'limit') {
+            //     target["offset"] = value * ~~(target['offset']/value)
+            // }
+
             if (key === 'search') {
                 target['offset'] = 0
             }
@@ -236,12 +241,16 @@ const clickHandlerById = {
     'next': () => {
         if (paginationProxy.offset < total_users - paginationProxy.limit) {
             paginationProxy.offset += paginationProxy.limit
+            return
         }
+        paginationProxy.offset = total_users - paginationProxy.limit
     },
     'prev': () => {
         if (paginationProxy.offset - paginationProxy.limit >= 0) {
             paginationProxy.offset -= paginationProxy.limit
+            return
         }
+        paginationProxy.offset = 0
     },
     'save-modal': async() => {
         await handleSave()
