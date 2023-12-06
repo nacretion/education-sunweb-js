@@ -11,6 +11,11 @@ const paginationProxy = new Proxy(
         set: function (target, key, value) {
             target[key] = value;
 
+            // Найдено решение лучше, чем определять новый offset или обнулять его
+            // if (key === 'limit') {
+            //     target["offset"] = value * ~~(target['offset']/value)
+            // }
+
             if (key === 'search') {
                 target['offset'] = 0
             }
@@ -32,7 +37,7 @@ const getUsers = async (
 ) => {
     loader.classList.add('loaderShow')
     const url = baseGETURL +
-        `/users?offset=${offset}&limit=${limit}${search? '&search=' + search : ''}`
+        `/users?offset=${offset}&limit=${limit}${search ? '&search=' + search : ''}`
 
     const data = await fetch(url)
 
@@ -85,6 +90,8 @@ const filter = document.getElementById('filter')
 const notify = document.getElementsByClassName('toast')[0] || undefined
 const notifyBody = document.getElementById('notifyBody')
 const loader = document.getElementById('loader')
+const dropdown = document.getElementById('dropdown')
+const dropdownMenu = document.getElementById('dropdownMenu')
 
 const tableFields = ['id', 'first_name', 'last_name', 'date_of_birth', 'gender', 'email', 'street']
 const getFormatFunc = {
@@ -211,37 +218,75 @@ const getStaffsMaxId = () => {
     return Math.max(...paginationProxy.staffs.map((elem) => elem.id))
 }
 
-document.addEventListener('click', async (ev) => {
-    ev.stopPropagation()
-    if (ev.target.id === 'buttonAdd') {
+const clickHandlerByClass = {
+    default: () => {},
+    'close-modal': () => {
+        modal.classList.toggle('show')
+    },
+    'dropdown-item': (ev) => {
+        paginationProxy.limit = +ev.target.innerHTML
+        dropdown.children[0].innerHTML = ev.target.innerHTML
+        dropdownMenu.classList.toggle('show')
+    },
+    'dropdown-toggle': () => {
+        dropdownMenu.classList.toggle('show')
+    },
+    'buttonDelete': async(ev) => {
+        await handleRemove(ev.target.parentElement.ref)
+    }
+}
+
+const clickHandlerById = {
+    default: () => {},
+    'next': () => {
+        if (paginationProxy.offset < total_users - paginationProxy.limit) {
+            paginationProxy.offset += paginationProxy.limit
+            return
+        }
+        paginationProxy.offset = total_users - paginationProxy.limit
+    },
+    'prev': () => {
+        if (paginationProxy.offset - paginationProxy.limit >= 0) {
+            paginationProxy.offset -= paginationProxy.limit
+            return
+        }
+        paginationProxy.offset = 0
+    },
+    'save-modal': async() => {
+        await handleSave()
+    },
+    'buttonAdd': () => {
         modal.classList.toggle('show')
         form.reset()
     }
+}
 
-    if (ev.target.className.includes('close-modal')) {
-        modal.classList.toggle('show')
-    }
+document.addEventListener('click', async (ev) => {
+    ev.stopPropagation()
 
     if (ev.target.dataset.sort) {
         ev.target.dataset.order = ev.target.dataset.order === 'asc' ? 'desc' : 'asc'
         sortData(ev.target.dataset)
-    }
-
-    if (ev.target.className === 'buttonDelete') {
-        await handleRemove(ev.target.parentElement.ref)
-    }
-
-    if (ev.target.id === "next" && paginationProxy.offset < total_users - paginationProxy.limit) {
-        paginationProxy.offset += paginationProxy.limit
-    }
-
-    if (ev.target.id === "prev" && paginationProxy.offset - paginationProxy.limit >= 0) {
-        paginationProxy.offset -= paginationProxy.limit
+        return
     }
 
     if (ev.target.id === "save-modal") {
         await handleSave()
+        return
     }
+
+    const {id, classList} = ev.target
+
+    const validClass = Object.values(classList).find(
+        className => Object.keys(clickHandlerByClass).includes(className)
+    )
+
+    const classHandler = clickHandlerByClass[validClass] || clickHandlerByClass.default
+    const idHandler = clickHandlerById[id] || clickHandlerById.default
+
+    await classHandler(ev)
+    await idHandler()
+
 }, {})
 
 filter.addEventListener('input', debounce(() => filterData()))
