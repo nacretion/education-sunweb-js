@@ -25,6 +25,7 @@
     <VueTable
         @rowSelect="toggleRowModal"
         @sort="handleSort($event)"
+        :sorts="sorts"
         :items="users"
         :replacements="tableFieldsReplacements"
         :valuesReplacements="tableValuesReplacements"

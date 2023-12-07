@@ -2,7 +2,7 @@
   <table class="table">
     <thead>
       <tr>
-        <th scope="col" v-for="column in Object.keys(items[0])" :key="column" @click="$emit('sort', column)">
+        <th scope="col" v-for="column in Object.keys(items[0])" :class="sorts[column]" :key="column" @click="$emit('sort', column)">
           {{ replacements? replacements[column] : column }}
         </th>
       </tr>
@@ -32,6 +32,10 @@ export default {
     },
     valuesReplacements: {
       type: Object
+    },
+    sorts: {
+      type: Object,
+      default: () => ({})
     }
   },
   data () {

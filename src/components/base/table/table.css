@@ -20,10 +20,23 @@
     font-size: 12px;
 }
 
+
 .table thead th {
+    position: relative;
     color: #ffffff;
     background: #4FC3A1;
 }
+
+.table thead .asc:after {
+    position: absolute;
+    content: '\25b2';
+    right: 5px;
+}
+.table thead .desc:after {
+     position: absolute;
+     content: '\25bc';
+     right: 5px;
+ }
 
 .table thead th:nth-child(odd) {
     color: #ffffff;
