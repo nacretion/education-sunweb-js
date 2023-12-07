@@ -2,13 +2,13 @@
   <table class="table">
     <thead>
       <tr>
-        <th scope="col" v-for="column in Object.keys(items[0])" :key="column">
+        <th scope="col" v-for="column in Object.keys(items[0])" :key="column" @click="$emit('sort', column)">
           {{ replacements? replacements[column] : column }}
         </th>
       </tr>
     </thead>
     <tbody>
-      <tr v-for="item in items" :key="item[Object.keys(item)[0]]">
+      <tr v-for="item in items" :key="item[Object.keys(item)[0]]" @click="$emit('rowSelect', item)">
         <td v-for="key in Object.keys(item)" :key="item[key]">
           {{ replaceValue(key, item[key]) }}
         </td>
