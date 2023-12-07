@@ -1,5 +1,11 @@
 <template>
   <VueModal :show="show">
+    <p>
+      {{ selectedUser.first_name }}
+      {{ selectedUser.last_name }}
+      with id =
+      {{ selectedUser.id }}
+    </p>
     <div class="controls">
       <VueButton @click="$emit('edit')">
         Изменить
@@ -26,6 +32,10 @@ export default {
     show: {
       type: Boolean,
       default: false
+    },
+    selectedUser: {
+      type: Object,
+      default: () => ({})
     }
   }
 

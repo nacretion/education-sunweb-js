@@ -6,7 +6,12 @@
         :selectedUser="selectedUser"
         @close="toggleModal()"
         @save="handleSave($event)"/>
-    <ChooseModal @delete="deleteUser(selectedUser.id)" @edit="toggleModal()" :show="showRowModal" @close="toggleRowModal()"/>
+    <ChooseModal
+        @delete="deleteUser(selectedUser.id)"
+        @edit="toggleModal()"
+        :show="showRowModal"
+        :selectedUser="selectedUser"
+        @close="toggleRowModal()"/>
     <div class="controls">
       <VueInput
           :placeholder="'Поиск'"
