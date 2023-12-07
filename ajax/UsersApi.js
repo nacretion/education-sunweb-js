@@ -39,6 +39,19 @@ class UsersApi extends Api {
             return response.users
         }
     }
+
+    /**
+     * Удалить пользователя
+     * @param id id пользователя которого нужно удалить
+     * @returns {Promise<boolean>}
+     */
+    async deleteUser(id) {
+        const response = await this.delete(`/${id}`)
+
+        if (response.ok) {
+            return true
+        }
+    }
 }
 
 export default UsersApi

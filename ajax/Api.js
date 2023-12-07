@@ -42,6 +42,12 @@ class Api {
         })
             .then(response => response.json());
     }
+
+    delete(query) {
+        return fetch(this.basePOSTUrl + query, {
+            method: "DELETE",
+        });
+    }
 }
 
 export default Api
