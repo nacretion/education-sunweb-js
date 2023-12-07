@@ -1,11 +1,24 @@
 <template>
   <div id="app">
-    <VueTable :items="items" :replacements="tableFieldsReplacements" :valuesReplacements="tableValuesReplacements"></VueTable>
+    <div class="controls">
+      <VueInput
+          :placeholder="'Поиск'"
+          :value="search"
+          @input="search = $event"
+      />
+    </div>
+    <VueTable
+        :items="users"
+        :replacements="tableFieldsReplacements"
+        :valuesReplacements="tableValuesReplacements"
+    />
   </div>
 </template>
 
 <script>
+import debounce from 'debounce';
 import VueTable from './components/base/table/table.vue'
+import VueInput from './components/base/input/input.vue'
 import { UsersApi } from '../ajax'
 
 const api = new UsersApi(
@@ -16,11 +29,13 @@ const api = new UsersApi(
 export default {
   name: 'App',
   components: {
-    VueTable
+    VueTable,
+    VueInput
   },
   data() {
     return {
-      items: [{}],
+      // параметры отображения
+      users: [{}],
       tableFields: [
           'id',
           'first_name',
@@ -43,17 +58,23 @@ export default {
         default: (field) => field,
         date_of_birth: (field) => new Date(field).toLocaleDateString('en-US'),
         gender: (field) => field.trim().toLowerCase() === 'male' ? 'Мужской' : 'Женский',
-      }
+      },
+
+      search: '',
     }
-  },
-  computed: {
-  },
-  methods: {
   },
   mounted() {
     api.getUsers({fields: this.tableFields}).then(users => {
-      this.items = users
+      this.users = users
     })
+  },
+  watch: {
+    search: debounce(function () {
+      api.getUsers({search: this.search, fields: this.tableFields}).then(users => {
+        this.users = users
+      })
+    }, 500),
+
   }
 }
 </script>
@@ -70,5 +91,13 @@ export default {
     font-family: Helvetica, sans-serif;
     -webkit-font-smoothing: antialiased;
     background: rgba( 71, 147, 227, 1);
+  }
+  #app {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+    padding: 40px 0;
   }
 </style>
