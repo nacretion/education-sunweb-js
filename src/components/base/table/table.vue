@@ -9,8 +9,8 @@
     </thead>
     <tbody>
       <tr class='table__row' v-for="item in items" :key="item[Object.keys(item)[0]]" @click="$emit('rowSelect', item)">
-        <td v-for="key in Object.keys(item)" :key="item[key]">
-          {{ replaceValue(key, item[key]) }}
+        <td v-for="value in item" :key="value">
+          {{ value }}
         </td>
       </tr>
     </tbody>
@@ -40,26 +40,6 @@ export default {
     fieldToSort: {
       type: String
     }
-  },
-  data () {
-    return {
-    }
-  },
-  computed: {
-  },
-  methods: {
-    replaceValue: function (key, field) {
-      if (!this.valuesReplacements) {
-        return field
-      }
-
-      const replaceValue = this.valuesReplacements[key] || this.valuesReplacements.default
-      return replaceValue(field)
-    }
-  },
-  watch: {
-  },
-  mounted () {
   }
 }
 </script>

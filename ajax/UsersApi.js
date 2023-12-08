@@ -9,7 +9,7 @@ class UsersApi extends Api {
      * @param {number} params.offset Смещение от начала
      * @param {string?} params.search Поисковая строка
      * @param {array?} params.fields Поля, которые нужно вернуть
-     * @returns {Promise<array>}
+     * @returns {Promise<array|Error>}
      */
     async getUsers(params = {limit: 15, offset: 0}) {
         const response = await this.get(params)
@@ -25,12 +25,14 @@ class UsersApi extends Api {
                 }, {})
             )
         }
+
+        return new Error('Не удалось получить пользователей')
     }
 
     /**
      * Сохранить пользователя
      * @param user
-     * @returns {Promise<array>}
+     * @returns {Promise<array|Error>}
      */
     async saveUser(user) {
         const response = await this.post(user)
@@ -38,12 +40,14 @@ class UsersApi extends Api {
         if (response.success) {
             return response.users
         }
+
+        return new Error('Не удалось сохранить пользователя')
     }
 
     /**
      * Удалить пользователя
      * @param id id пользователя которого нужно удалить
-     * @returns {Promise<boolean>}
+     * @returns {Promise<boolean|Error>}
      */
     async deleteUser(id) {
         const response = await this.delete(`/${id}`)
@@ -51,6 +55,8 @@ class UsersApi extends Api {
         if (response.ok) {
             return true
         }
+
+        return new Error('Не удалось удалить пользователя')
     }
 }
 

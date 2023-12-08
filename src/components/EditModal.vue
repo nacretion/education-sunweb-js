@@ -10,7 +10,7 @@
             :name="'gender'"
             :value="'male'"
             id="male"
-            :checked="data.gender === 'male'"
+            :checked="data.gender === 'Мужской'"
             @input="inputHandler($event)"
         >
           Мужской
@@ -20,7 +20,7 @@
             :name="'gender'"
             :value="'female'"
             id="female"
-            :checked="data.gender === 'female'"
+            :checked="data.gender === 'Женский'"
             @input="inputHandler($event)"
         >
           Женский
@@ -103,7 +103,7 @@ export default {
         isEdit: Object.keys(this.selectedUser).length !== 0,
         first_name: this.data.first_name,
         last_name: this.data.last_name,
-        date_of_birth: this.data.date_of_birth,
+        date_of_birth: new Date(this.data.date_of_birth).toLocaleDateString('en-US'),
         gender: this.data.gender,
         email: this.data.email,
         street: this.data.street

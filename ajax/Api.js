@@ -11,12 +11,7 @@ class Api {
      */
     constructor(baseGetUrl, basePOSTUrl) {
         this.baseGetUrl = baseGetUrl;
-
-        if (!basePOSTUrl) {
-            this.basePOSTUrl = baseGetUrl;
-        }
-
-        this.basePOSTUrl = basePOSTUrl;
+        this.basePOSTUrl = basePOSTUrl || baseGetUrl;
     }
 
     get(params) {

@@ -36,8 +36,6 @@ export default {
       interval: null
     }
   },
-  computed: {
-  },
   watch: {
     timeAlive: function () {
       if (this.timeAlive > this.timeToLive) {

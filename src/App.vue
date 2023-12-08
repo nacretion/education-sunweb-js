@@ -39,7 +39,6 @@
         :items="users"
         :fieldToSort="fieldToSort"
         :replacements="tableFieldsReplacements"
-        :valuesReplacements="tableValuesReplacements"
     />
     <div class="controls" v-if="Object.keys(users[0]).length">
       <VueButton :disabled="offset === 0" @click="handlePrev()">
@@ -103,11 +102,6 @@ export default {
         email: 'Электронная почта',
         street: 'Улица'
       },
-      tableValuesReplacements: {
-        default: (field) => field,
-        date_of_birth: (field) => new Date(field).toLocaleDateString('en-US'),
-        gender: (field) => field.trim().toLowerCase() === 'male' ? 'Мужской' : 'Женский',
-      },
 
       search: '',
       offset: 0,
@@ -137,18 +131,12 @@ export default {
       showModal: false,
       showRowModal: false,
       validators: {
-        default: /[a-zA-Z]{3,30}/,
+        default: /[A-Za-zА-Яа-яЁ]{3,30}/,
         date_of_birth: /\d{1,2}\/\d{1,2}\/\d{2,4}/,
         gender: /Мужской|Женский/,
         street: /^(\d+) ?([A-Za-z](?= ))? (.*?) ([^ ]+?) ?((?<= )APT)? ?((?<= )\d*)?$/,
         email: /^[\w\-.]+@([\w-]+\.)+[\w-]{2,4}$/
       },
-
-      getFormatFunc: {
-        default: (field) => field,
-        gender: (field) => field.trim().toLowerCase() === 'male' ? 'Мужской' : 'Женский',
-        date_of_birth: (field) => new Date(field).toLocaleDateString('en-US')
-      }
     }
   },
   methods: {
@@ -225,10 +213,8 @@ export default {
       this.clearErrors()
 
       Object.keys(user).forEach(key => {
-        const formatFunc = this.getFormatFunc[key] || this.getFormatFunc.default
-        const formattedField = formatFunc(user[key])
         const regex = this.validators[key] || this.validators.default
-        if (!regex.test(formattedField)) {
+        if (!regex.test(user[key])) {
           this.errors[key] = true
         }
       })
@@ -246,6 +232,10 @@ export default {
           this.users = [{}]
           return
         }
+        users.forEach(user => {
+          user.date_of_birth = new Date(user.date_of_birth).toLocaleDateString('en-US')
+          user.gender = user.gender.trim().toLowerCase() === 'male' ? 'Мужской' : 'Женский'
+        })
         this.users = users
       })
     },
