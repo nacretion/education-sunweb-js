@@ -207,13 +207,11 @@ export default {
 
       api.saveUser(user).then(() => {
         this.toggleModal()
-        api.getUsers({fields: this.tableFields}).then(users => {
-          this.users = users
-          this.addNotify({
-            variant: 'success',
-            message: `Пользователь ${user.first_name} ${method}!`,
-            timeToLive: 3000
-          })
+        this.getUsers()
+        this.addNotify({
+          variant: 'success',
+          message: `Пользователь ${user.first_name} ${method}!`,
+          timeToLive: 3000
         })
       })
     },
@@ -239,6 +237,15 @@ export default {
     },
     getUsers() {
       api.getUsers({offset: this.offset, fields: this.tableFields, limit: this.limit, search: this.search}).then(users => {
+        if (!users.length) {
+          this.addNotify({
+            variant: 'error',
+            message: `Пользователи не найдены!`,
+            timeToLive: 8000
+          })
+          this.users = [{}]
+          return
+        }
         this.users = users
       })
     },
@@ -248,14 +255,17 @@ export default {
           return
         }
         this.showRowModal = false
+        this.addNotify({
+          variant: 'success',
+          message: `Пользователь удален!`,
+          timeToLive: 3000
+        })
         this.getUsers()
       })
     }
   },
   mounted() {
-    api.getUsers({fields: this.tableFields}).then(users => {
-      this.users = users
-    })
+    this.getUsers()
   },
   watch: {
     fieldToSort: function (newValue) {
@@ -272,10 +282,7 @@ export default {
       this.getUsers()
     },
     search: debounce(function () {
-      api.getUsers({search: this.search, fields: this.tableFields}).then(users => {
-
-        this.users = users.length? users : [{}]
-      })
+      this.getUsers()
     }, 500),
 
   }

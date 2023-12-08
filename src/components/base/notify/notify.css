@@ -27,3 +27,7 @@
     z-index: 11;
     transition: all 400ms;
 }
+
+.notify--error {
+    background: #f44336;
+}
