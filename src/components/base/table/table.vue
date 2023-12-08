@@ -8,7 +8,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr v-for="item in items" :key="item[Object.keys(item)[0]]" @click="$emit('rowSelect', item)">
+      <tr class='table__row' v-for="item in items" :key="item[Object.keys(item)[0]]" @click="$emit('rowSelect', item)">
         <td v-for="key in Object.keys(item)" :key="item[key]">
           {{ replaceValue(key, item[key]) }}
         </td>
