@@ -1,5 +1,15 @@
 <template>
   <div id="app">
+    <div class="notifyContainer">
+      <VueNotify
+          v-for="notify in notifies"
+          :key="notify.hash"
+          :variant="notify.variant"
+          :message="notify.message"
+          :timeToLive="notify.timeToLive"
+          @close="removeNotify(notify)"
+      />
+    </div>
     <EditModal
         :show="showModal"
         :errors="errors"
@@ -27,6 +37,7 @@
         @sort="handleSort($event)"
         :sorts="sorts"
         :items="users"
+        :fieldToSort="fieldToSort"
         :replacements="tableFieldsReplacements"
         :valuesReplacements="tableValuesReplacements"
     />
@@ -51,6 +62,7 @@ import VueButton from "@/components/base/button/button.vue";
 import EditModal from "@/components/EditModal.vue";
 import VueSelect from "@/components/base/select/select.vue";
 import ChooseModal from "@/components/ChooseModal.vue";
+import VueNotify from "@/components/base/notify/notify.vue";
 
 const api = new UsersApi(
     'https://api.slingacademy.com/v1/sample-data/users',
@@ -60,6 +72,7 @@ const api = new UsersApi(
 export default {
   name: 'App',
   components: {
+    VueNotify,
     ChooseModal,
     VueSelect,
     EditModal,
@@ -80,6 +93,7 @@ export default {
           'email',
           'street'
       ],
+      notifies: [],
       tableFieldsReplacements: {
         id: '#',
         first_name: 'Имя',
@@ -118,6 +132,7 @@ export default {
         email: 'asc',
         street: 'asc'
       },
+      fieldToSort: '',
 
       showModal: false,
       showRowModal: false,
@@ -137,8 +152,20 @@ export default {
     }
   },
   methods: {
+    removeNotify(notify) {
+      const index = this.notifies.indexOf(notify)
+      this.notifies.splice(index, 1)
+    },
+    addNotify(notify) {
+      this.notifies.push({
+        ...notify,
+        hash: Math.random()*1000
+      })
+    },
+
     handleSort(column) {
       this.sorts[column] = this.sorts[column] === 'asc' ? 'desc' : 'asc'
+      this.fieldToSort = column
       this.users = this.users.sort((a, b) => {
         if (this.sorts[column] === 'asc') {
           return a[column] > b[column] ? 1 : -1
@@ -176,10 +203,17 @@ export default {
       if (!this.validateUser(user)) {
         return
       }
+      const method = user.isEdit ? 'изменен' : 'создан'
+
       api.saveUser(user).then(() => {
         this.toggleModal()
         api.getUsers({fields: this.tableFields}).then(users => {
           this.users = users
+          this.addNotify({
+            variant: 'success',
+            message: `Пользователь ${user.first_name} ${method}!`,
+            timeToLive: 3000
+          })
         })
       })
     },
@@ -224,6 +258,13 @@ export default {
     })
   },
   watch: {
+    fieldToSort: function (newValue) {
+      Object.keys(this.sorts).forEach(key => {
+        if (key !== newValue) {
+          this.sorts[key] = 'asc'
+        }
+      })
+    },
     offset: function () {
       this.getUsers()
     },
@@ -267,6 +308,17 @@ export default {
     display: flex;
     justify-content: center;
     gap: 20px;
+  }
+  .notifyContainer {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px;
   }
 
 </style>

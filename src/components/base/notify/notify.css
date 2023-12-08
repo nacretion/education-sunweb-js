@@ -1,0 +1,29 @@
+.notify {
+    width: 300px;
+    height: 40px;
+    background-size: 200%;
+    border: none;
+    outline: none;
+    background: #4FC3A1;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 4px;
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 10px;
+    cursor: pointer;
+    position: relative;
+    z-index: 10;
+}
+.notify__time {
+    background: #3878b7;
+    position: absolute;
+    height: 2px;
+    left: 0;
+    bottom: 0;
+    z-index: 11;
+    transition: all 400ms;
+}

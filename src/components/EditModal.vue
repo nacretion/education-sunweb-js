@@ -100,7 +100,7 @@ export default {
     },
     collectData() {
       return {
-        isEdit: this.isEdit,
+        isEdit: Object.keys(this.selectedUser).length !== 0,
         first_name: this.data.first_name,
         last_name: this.data.last_name,
         date_of_birth: this.data.date_of_birth,

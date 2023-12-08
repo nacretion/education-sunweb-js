@@ -2,7 +2,7 @@
   <table class="table">
     <thead>
       <tr>
-        <th scope="col" v-for="column in Object.keys(items[0])" :class="sorts[column]" :key="column" @click="$emit('sort', column)">
+        <th scope="col" v-for="column in Object.keys(items[0])" :class="fieldToSort === column ? sorts[column] : ''" :key="column" @click="$emit('sort', column)">
           {{ replacements? replacements[column] : column }}
         </th>
       </tr>
@@ -36,6 +36,9 @@ export default {
     sorts: {
       type: Object,
       default: () => ({})
+    },
+    fieldToSort: {
+      type: String
     }
   },
   data () {
