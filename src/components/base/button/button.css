@@ -1,0 +1,53 @@
+.button {
+    width: 300px;
+    height: 40px;
+    background-size: 200%;
+    border: none;
+    outline: none;
+    transition: background-color 400ms;
+}
+
+.button--primary {
+    color: #fff;
+    background: #4FC3A1;
+}
+
+.button--primary-sized {
+    color: #fff;
+    background: #4FC3A1;
+    width: 100%;
+}
+
+.button--secondary {
+    color: #fff;
+    background: #324960;
+}
+.button--secondary-sized {
+    color: #fff;
+    background: #324960;
+    width: 100%;
+}
+
+.button--danger {
+    color: #fff;
+    background: #bd0000;
+}
+
+.button:hover {
+    cursor: pointer;
+    background: #5bdcb8;
+}
+
+.button--secondary-sized:hover {
+    background: #3f5c7a;
+}
+
+.button--danger:hover {
+    color: #fff;
+    background: #a90101;
+}
+
+.button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
